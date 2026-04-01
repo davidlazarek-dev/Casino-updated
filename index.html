@@ -8,6 +8,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .repay-container {
+            margin: 10px 0;
+            text-align: center;
+        }
+        .btn-repay {
+            background: #4ade80;
+            color: #1a1a1a;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-repay:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 
@@ -36,6 +57,10 @@
                 </div>
             </div>
 
+            <div class="repay-container">
+                <button id="repay-button" class="btn-repay" onclick="repayDebt()">SPLATIT CELÝ DLUH</button>
+            </div>
+
             <div class="reels-window">
                 <div class="reels">
                     <div class="reel" id="reel1">🍌</div>
@@ -61,7 +86,6 @@
                     <div class="payout-item"><span>Jakékoliv dva 🍌</span> <span class="prize">+10</span></div>
                 </div>
             </div>
-            <div class="about-me">Mám rád automaty :)</div>
         </div>
     </div>
 
@@ -70,14 +94,7 @@
         <div class="toast-body" id="toast-message">...</div>
     </div>
 
-    <div id="hacked-ads-container">
-        <div class="fake-ad" id="ad-error" style="display:none; bottom: 20%; left: 5%; animation: flashAd 0.1s infinite reverse; transform: rotate(-5deg);">
-            ⚠️ KRITICKÁ CHYBA: TVŮJ DISK JE PRÁVĚ FORMÁTOVÁN LIDOOPEM ⚠️
-        </div>
-    </div>
-
     <script>
-        // Načítání stavu - ošetření NaN
         const urlParams = new URLSearchParams(window.location.search);
         let wallet = parseInt(urlParams.get('wallet')); wallet = isNaN(wallet) ? 100 : wallet;
         let debt = parseInt(urlParams.get('debt')); debt = isNaN(debt) ? 0 : debt;
@@ -88,15 +105,20 @@
             window.location.href = `${page}?wallet=${wallet}&debt=${debt}&spins=${spinsInDebt}&loans=${loanCount}`;
         }
 
-        // --- ZVUKY ---
+        // --- HUDBA A ZVUKY ---
         const sfxSpin = new Audio('spin.mp3');
         const sfxWin = new Audio('win.mp3');
         const sfxJackpot = new Audio('jackpot.mp3');
         const sfxMonkey = new Audio('monkey.mp3');
+        
+        const bgMusic = new Audio('bg-music.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.15; // Trochu potichu
+        let isMusicPlaying = false;
 
         function playSound(audio) {
             audio.currentTime = 0;
-            audio.play().catch(() => console.log("Zvuk čeká na interakci uživatele."));
+            audio.play().catch(() => {});
         }
 
         const SPIN_COST = 5;
@@ -105,16 +127,18 @@
         const debtDisplays = document.querySelectorAll('.debt-display');
         const reelElements = [document.getElementById("reel1"), document.getElementById("reel2"), document.getElementById("reel3")];
         const spinButton = document.getElementById("spin-button");
+        const repayButton = document.getElementById("repay-button");
         const messageDisplay = document.getElementById("message");
         const chimpToast = document.getElementById("chimp-toast");
         const toastMessage = document.getElementById("toast-message");
         let toastTimeout;
 
+        // Šimpanzovy hlášky zůstávají pro atmosféru, ale už tě nestojí peníze
         const chimpThreats = {
-            3: "Hej kámo, nezapomněl jsi na něco? 🍌",
-            6: "Ten úrok ti roste před očima. Moje trpělivost ne. 🦍",
-            13: "Už posílám gorily. Radši koukej trefit jackpot.",
-            25: "Od zítřka pracuješ pro mě v dole na slupky."
+            5: "Pěkně točíš, ale ten dluh tam pořád vidím. 🍌",
+            15: "Nezapomeň, že šimpanz nikdy nezapomíná. 🦍",
+            30: "Už mi dlužíš docela dlouho. Moje trpělivost má meze.",
+            50: "Gorily už si obouvají boty..."
         };
 
         function showChimpToast(text) {
@@ -131,30 +155,44 @@
                 el.textContent = debt;
                 el.parentElement.style.color = debt > 0 ? "#ff4b2b" : "#888";
             });
+            repayButton.disabled = (debt <= 0 || wallet < debt);
+        }
+
+        function repayDebt() {
+            if (wallet >= debt) {
+                wallet -= debt;
+                debt = 0;
+                spinsInDebt = 0;
+                messageDisplay.textContent = "Dluh splacen! Jsi čistý jako čerstvě oloupaný banán.";
+                messageDisplay.className = "win";
+                updateAllDisplays();
+            }
         }
 
         function spin() {
+            if (!isMusicPlaying) {
+                bgMusic.play();
+                isMusicPlaying = true;
+            }
+
             if (wallet < SPIN_COST) {
                 messageDisplay.textContent = "Nemáš banány! Běž si půjčit do Banky.";
                 messageDisplay.className = "lose"; return;
             }
             wallet -= SPIN_COST;
             playSound(sfxSpin);
-            let interestApplied = 0;
 
+            // ÚROK BYL ODSTRANĚN - Dluh se při spinu nemění
             if (debt > 0) {
                 spinsInDebt++;
-                // TVŮJ NOVÝ FIXNÍ ÚROK 2%
-                let currentInterestRate = 0.02; 
-                interestApplied = Math.floor(debt * currentInterestRate) + 1; 
-                debt += interestApplied;
                 if (chimpThreats[spinsInDebt]) showChimpToast(chimpThreats[spinsInDebt]);
             }
+
             updateAllDisplays();
-            
             spinButton.disabled = true;
+            repayButton.disabled = true;
             messageDisplay.className = "";
-            messageDisplay.textContent = interestApplied > 0 ? `Točí se... (+${interestApplied}🍌 úrok)` : "Točí se...";
+            messageDisplay.textContent = "Točí se...";
 
             const results = [SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)], SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)], SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]];
 
@@ -168,7 +206,8 @@
 
             setTimeout(() => {
                 checkWin(results[0], results[1], results[2]); 
-                updateAllDisplays(); spinButton.disabled = false;
+                updateAllDisplays(); 
+                spinButton.disabled = false;
             }, 2600);
         }
 
