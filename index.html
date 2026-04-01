@@ -188,7 +188,7 @@
 
             if (debt > 0) {
                 spinsInDebt++;
-                let currentInterestRate = 0.02 + (spinsInDebt * 0.0002); 
+                let currentInterestRate = 0.02; 
                 interestApplied = Math.floor(debt * currentInterestRate) + 1; 
                 debt += interestApplied;
                 if (chimpThreats[spinsInDebt]) showChimpToast(chimpThreats[spinsInDebt]);
