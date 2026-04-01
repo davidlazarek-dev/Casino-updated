@@ -1,0 +1,50 @@
+{
+  "profiles": [
+    {
+      "id": "kong_69",
+      "name": "Kong_69",
+      "avatar": "🦍",
+      "distance": "0.5 km",
+      "goal": "Tvá peněženka",
+      "replies": [
+        "OOH OOH AHH AHH! Dělej prachy!",
+        "Kde jsou moje banány? 🍌",
+        "Pošli mi detaily kreditky. Jsem opravdová lidská samice.",
+        "*Háze exkrementy na monitor*",
+        "Tvoje dluhy rostou. Banka mi volala."
+      ],
+      "extortion_amount": 1000,
+      "extortion_msg": "Vím, že máš peníze z automatů. Dej mi 1000 Kč, nebo na tebe pošlu virus."
+    },
+    {
+      "id": "crypto_macaque",
+      "name": "Macaque_Broker",
+      "avatar": "🦧",
+      "distance": "12 km (přes VPN)",
+      "goal": "Kryptoměny a chaos",
+      "replies": [
+        "Uúú áá! Koupil jsi už ten můj NFT banán?",
+        "Banka tě sleduje. Já taky.",
+        "Hacknul jsem ti webkameru. Vypadáš zoufale.",
+        "Dneska padne červená. Věř mi."
+      ],
+      "extortion_amount": 5000,
+      "extortion_msg": "Tohle není hra. Pošli mi 5000 Kč, jinak tvůj dluh v bance okamžitě zdvojnásobím."
+    },
+    {
+      "id": "boss_silverback",
+      "name": "El_Silverback",
+      "avatar": "🐒",
+      "distance": "Za tvými zády",
+      "goal": "Absolutní bankrot",
+      "replies": [
+        "...",
+        "Ticho.",
+        "Moje gorily tě sledují.",
+        "Myslíš, že to kasino je fér? Já ho vlastním."
+      ],
+      "extortion_amount": 15000,
+      "extortion_msg": "Tvůj čas vypršel. Dej mi 15000 Kč nebo končíš."
+    }
+  ]
+}
