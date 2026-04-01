@@ -94,6 +94,8 @@
         <div class="toast-body" id="toast-message">...</div>
     </div>
 
+    <div id="hacked-ads-container"></div>
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let wallet = parseInt(urlParams.get('wallet')); wallet = isNaN(wallet) ? 100 : wallet;
@@ -113,7 +115,7 @@
         
         const bgMusic = new Audio('bg-music.mp3');
         bgMusic.loop = true;
-        bgMusic.volume = 0.15; // Trochu potichu
+        bgMusic.volume = 0.15;
         let isMusicPlaying = false;
 
         function playSound(audio) {
@@ -133,7 +135,6 @@
         const toastMessage = document.getElementById("toast-message");
         let toastTimeout;
 
-        // Šimpanzovy hlášky zůstávají pro atmosféru, ale už tě nestojí peníze
         const chimpThreats = {
             5: "Pěkně točíš, ale ten dluh tam pořád vidím. 🍌",
             15: "Nezapomeň, že šimpanz nikdy nezapomíná. 🦍",
@@ -147,6 +148,36 @@
             chimpToast.classList.add('show');
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => { chimpToast.classList.remove('show'); }, 6000);
+        }
+
+        // --- VIRUS REKLAMY NA SEZNAMKU ---
+        function createChimpAd() {
+            const ad = document.createElement('div');
+            ad.className = 'fake-ad';
+            ad.style.top = Math.floor(Math.random() * 70) + 10 + "%";
+            ad.style.left = Math.floor(Math.random() * 70) + 10 + "%";
+            ad.style.transform = `rotate(${Math.floor(Math.random() * 40) - 20}deg)`;
+            
+            ad.innerHTML = `
+                <button class="close-btn">X</button>
+                🔥 ŽHAVÍ NEZADANÍ ŠIMPANZI<br>VE TVÉM OKOLÍ ČEKAJÍ<br>NA TVÉ BANÁNY! 🍌💦<br>
+                <button class="chat-btn">KLIKNI ZDE PRO CHAT</button>
+            `;
+
+            const handleClose = (e) => {
+                e.stopPropagation(); 
+                ad.remove();
+                // Když reklamu zavře, vyskočí dvě další (hydra efekt)
+                createChimpAd(); 
+                createChimpAd();
+            };
+
+            ad.querySelector('.close-btn').addEventListener('click', handleClose);
+            ad.querySelector('.chat-btn').addEventListener('click', (e) => {
+                handleClose(e); 
+                navigate('chat.html');
+            });
+            document.getElementById('hacked-ads-container').appendChild(ad);
         }
 
         function updateAllDisplays() {
@@ -166,12 +197,15 @@
                 messageDisplay.textContent = "Dluh splacen! Jsi čistý jako čerstvě oloupaný banán.";
                 messageDisplay.className = "win";
                 updateAllDisplays();
+                
+                // Vyčistí otravné reklamy po splacení dluhu
+                document.getElementById('hacked-ads-container').innerHTML = '';
             }
         }
 
         function spin() {
             if (!isMusicPlaying) {
-                bgMusic.play();
+                bgMusic.play().catch(() => {});
                 isMusicPlaying = true;
             }
 
@@ -182,7 +216,6 @@
             wallet -= SPIN_COST;
             playSound(sfxSpin);
 
-            // ÚROK BYL ODSTRANĚN - Dluh se při spinu nemění
             if (debt > 0) {
                 spinsInDebt++;
                 if (chimpThreats[spinsInDebt]) showChimpToast(chimpThreats[spinsInDebt]);
@@ -228,7 +261,9 @@
             if (payout > 0) messageDisplay.className = "win";
         }
 
+        // Inicializace při spuštění hry
         updateAllDisplays();
+        createChimpAd(); // Založí první reklamu
         spinButton.addEventListener("click", spin);
     </script>
 </body>
