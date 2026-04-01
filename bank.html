@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banka - Davidovy Automaty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <button class="nav-btn" onclick="navigate('index.html')">🏠 Automaty</button>
+        <button class="nav-btn active" onclick="navigate('bank.html')">🦍 Banka</button>
+        <button class="nav-btn" onclick="navigate('help.html')">🆘 Pomoc</button>
+    </nav>
+
+    <div class="page-layout">
+        <div class="panel-container">
+            <div class="header">
+                <h1>BANÁNOVÁ BANKA</h1>
+                <div class="subtitle">Lichva s.r.o.</div>
+            </div>
+
+            <div class="chimp-image">🦍</div>
+            
+            <div class="bank-quote" id="bank-quote">...</div>
+
+            <div class="status-bar">
+                <div class="status-box">
+                    <div class="status-label">K DISPOZICI</div>
+                    <div class="status-val val-good"><span class="wallet-display">100</span> 🍌</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">TVŮJ DLUH</div>
+                    <div class="status-val val-bad"><span class="debt-display">0</span> 🍌</div>
+                </div>
+            </div>
+
+            <button id="loan-button" class="btn-primary btn-bank">Vzít půjčku: +100 🍌<br><span id="loan-cost-text" style="font-size:0.8rem">(Dluh +150 🍌)</span></button>
+            <button id="pay-button" class="btn-primary btn-pay">Splácet dluh: -50 🍌<br><span style="font-size:0.8rem">(Z tvé peněženky)</span></button>
+            
+            <div class="message-box">
+                <p id="bank-message">Šimpanz tě sleduje...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let wallet = parseInt(urlParams.get('wallet')) ?? 100;
+        let debt = parseInt(urlParams.get('debt')) ?? 0;
+        let spinsInDebt = parseInt(urlParams.get('spins')) ?? 0;
+        let loanCount = parseInt(urlParams.get('loans')) ?? 0;
+        let currentDebtIncrease = 150 + (loanCount * 50);
+
+        function navigate(page) {
+            window.location.href = `${page}?wallet=${wallet}&debt=${debt}&spins=${spinsInDebt}&loans=${loanCount}`;
+        }
+
+        const walletDisplays = document.querySelectorAll('.wallet-display');
+        const debtDisplays = document.querySelectorAll('.debt-display');
+        const loanButton = document.getElementById("loan-button");
+        const payButton = document.getElementById("pay-button");
+        const bankMessage = document.getElementById("bank-message");
+        const bankQuote = document.getElementById("bank-quote");
+        const loanCostText = document.getElementById("loan-cost-text");
+
+        function updateAllDisplays() {
+            walletDisplays.forEach(el => el.textContent = wallet);
+            debtDisplays.forEach(el => el.textContent = debt);
+            debtDisplays.forEach(el => {
+                if (debt > 0) el.parentElement.style.color = "#ff4b2b";
+                else el.parentElement.style.color = "#888";
+            });
+        }
+
+        function updateBankUI() {
+            loanCostText.textContent = `(Dluh +${currentDebtIncrease} 🍌)`;
+            if (loanCount === 0) bankQuote.textContent = '"Došly banány? Žádný problém. Půjčím ti 100 banánů, ale tvůj dluh stoupne o 150. A čím víckrát přijdeš, tím hůř pro tebe!"';
+            else if (loanCount === 1) bankQuote.textContent = '"Zase jsi tady? Půjčím ti dalších 100, ale vzhledem k tvé situaci ti naúčtuju víc."';
+            else if (loanCount === 2) bankQuote.textContent = '"Ty opravdu neumíš hrát, co? Riziková přirážka! Bude to bolet."';
+            else bankQuote.textContent = '"Tohle už je čistokrevná lichva. Ale ty ty banány potřebuješ, že jo?"';
+        }
+
+        loanButton.addEventListener('click', () => {
+            wallet += 100;
+            debt += currentDebtIncrease; 
+            loanCount++;
+            currentDebtIncrease = 150 + (loanCount * 50); 
+            updateBankUI();
+            bankMessage.textContent = "Šimpanz se směje: 'Výborně! Příště už to bude dražší.'";
+            bankMessage.className = "lose";
+            updateAllDisplays();
+        });
+
+        payButton.addEventListener('click', () => {
+            if (debt === 0) {
+                bankMessage.textContent = "Nemáš žádný dluh. Běž hrát!"; bankMessage.className = "win"; return;
+            }
+            if (wallet >= 50) {
+                wallet -= 50;
+                let payAmount = Math.min(debt, 50);
+                debt -= payAmount;
+                
+                if (debt === 0) {
+                    spinsInDebt = 0; loanCount = 0; currentDebtIncrease = 150;
+                    updateBankUI();
+                    bankMessage.textContent = `Splaceno! Šimpanz nevypadá nadšeně, že máš čistý štít.`;
+                } else {
+                    bankMessage.textContent = `Splaceno ${payAmount}🍌. Šimpanz chce víc!`;
+                }
+                bankMessage.className = "win";
+            } else {
+                bankMessage.textContent = "Nemáš dost banánů na splátku (potřebuješ 50)!"; bankMessage.className = "lose";
+            }
+            updateAllDisplays();
+        });
+
+        // Init
+        updateBankUI();
+        updateAllDisplays();
+    </script>
+</body>
+</html>
