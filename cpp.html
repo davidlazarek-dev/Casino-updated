@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svatyně Sigma Vlků: Monako</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Luxusní černo-zlatý design */
+        body {
+            background-color: #0f0f0f; /* Temné pozadí */
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 40px 20px;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            color: #ffd700; /* Zlatá barva */
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        /* Stylové tlačítko pro externí odkaz (přesně podle zadání nad iframem) */
+        .sigma-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            color: #000;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sigma-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+        }
+
+        /* Kontejner pro PDF s luxusním rámečkem */
+        .pdf-container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 4px solid #ffd700;
+            border-radius: 16px;
+            padding: 8px;
+            background: #222;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .pdf-container:hover {
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+        }
+
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            border-radius: 10px;
+            background-color: #fff; /* Aby PDF svítilo i při načítání */
+        }
+
+        /* Tlačítko zpět dolů */
+        .back-btn {
+            display: inline-block;
+            margin-top: 40px;
+            color: #aaa;
+            text-decoration: none;
+            border: 2px solid #333;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #333;
+            color: #fff;
+            border-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Čtvrtletní práce</h1>
+    <div class="subtitle">Moje oblíbené místo: Svatyně v Monaku</div>
+
+    <a href="https://www.montecarlosbm.com/en/casino-monaco/casino-monte-carlo" target="_blank" class="sigma-btn">
+        🎰 Vstoupit do oficiálního revíru Casina
+    </a>
+
+    <div class="pdf-container">
+        <iframe src="moje_misto.pdf"></iframe>
+    </div>
+
+    <a href="index.html" class="back-btn">⬅ Zpět k opičím automatům (Beta svět)</a>
+
+</body>
+</html>
