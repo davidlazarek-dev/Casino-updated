@@ -3,129 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chimp Finder | Deep Web</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="chat.css">
+    <title>Chimpinder | Horké opice v okolí</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Speciální úprava pro seznamkový vibe */
+        .chat-header {
+            background: #ff007f !important;
+            border-bottom: 3px solid yellow !important;
+        }
+        .scam-banner {
+            background: yellow;
+            color: black;
+            font-size: 0.8rem;
+            padding: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .message.monkey { background: #333; border-left: 4px solid #ff007f; }
+    </style>
 </head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <button class="back-btn" id="back-btn">◄ ZPĚT</button>
-            CHIMP FINDER
-        </div>
+<body class="chat-body">
+    <div class="scam-banner">⚠️ VAROVÁNÍ: Neposílejte banány opicím, které neznáte osobně! ⚠️</div>
+    
+    <header class="chat-header main-nav">
+        <button class="nav-btn" onclick="window.location.href='index.html'">◄ ÚTĚK ZPĚT</button>
+        <h2 style="color: white; font-family: 'Montserrat';">🔥 CHIMPINDER 🔥</h2>
+    </header>
+
+    <main id="chat-container">
+        <div id="chat-box">
+            </div>
         
-        <div class="scam-warning">⚠️ VAROVÁNÍ: UŽIVATEL VYMÁHÁ BANÁNY A PENÍZE ⚠️</div>
-
-        <div class="profile-match">
-            <div class="chimp-avatar" id="chimp-avatar">?</div>
-            <div class="chimp-info">
-                <h2><span id="chimp-name">Načítání...</span> <span class="status-dot">●</span></h2>
-                <p id="chimp-distance">Lokalizace...</p>
-            </div>
+        <div class="chat-input-area">
+            <div id="quick-replies">
+                </div>
         </div>
+    </main>
 
-        <div class="chat-window" id="chat-window">
-            </div>
-
-        <div class="input-area">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Napiš zprávu..." autocomplete="off">
-            <button class="send-btn" id="send-btn">SEND</button>
-        </div>
-    </div>
-
-    <script src="chat.js" defer></script>
-</body>
-</html></head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <button class="back-btn" onclick="window.location.href='index.html'">◄ ZPĚT</button>
-            CHIMP FINDER
-        </div>
-        
-        <div class="scam-warning">⚠️ VAROVÁNÍ: UŽIVATEL VYMÁHÁ BANÁNY A PENÍZE ⚠️</div>
-
-        <div class="profile-match">
-            <div class="chimp-avatar">🦍</div>
-            <div class="chimp-info">
-                <h2>Kong_69 <span class="status-dot">●</span></h2>
-                <p>0.5 km daleko | Cíl: Tvá peněženka</p>
-            </div>
-        </div>
-
-        <div class="chat-window" id="chat-window">
-            <div class="message msg-chimp">
-                U OOH AHH AHH!! 🍌💦 Zaplať, nebo ti zlomím nohy. Vím o tvých dluzích.
-            </div>
-        </div>
-
-        <div class="input-area">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Napiš zprávu..." autocomplete="off">
-            <button class="send-btn" onclick="sendMessage()">SEND</button>
-        </div>
-    </div>
-
-    <script>
-        const chatWindow = document.getElementById('chat-window');
-        const chatInput = document.getElementById('chat-input');
-        let messageCount = 0;
-
-        const monkeyReplies = [
-            "OOH OOH AHH AHH! Dělej prachy!",
-            "Kde jsou moje banány? 🍌",
-            "Pošli mi detaily kreditky. Jsem opravdová lidská samice.",
-            "*Háze exkrementy na monitor*",
-            "Tvoje dluhy rostou. Banka mi volala.",
-            "Už stojím před tvým domem."
-        ];
-
-        function addMessage(text, isUser) {
-            const msg = document.createElement('div');
-            msg.className = `message ${isUser ? 'msg-user' : 'msg-chimp'}`;
-            msg.textContent = text;
-            chatWindow.appendChild(msg);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        function addExtortion() {
-            const msg = document.createElement('div');
-            msg.className = 'message msg-chimp';
-            msg.innerHTML = `Vím, že máš peníze z automatů. Dej mi 1000 Kč, nebo na tebe pošlu virus. <button class="action-btn" onclick="payMonkey(this)">ZAPLATIT 1000 Kč VÝPALNÉ</button>`;
-            chatWindow.appendChild(msg);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        window.payMonkey = function(btn) {
-            let debt = parseInt(localStorage.getItem('chimp_debt')) || 0;
-            localStorage.setItem('chimp_debt', debt + 1000);
-            btn.textContent = "ZAPLACENO (Dluh navýšen o 1000 Kč)";
-            btn.disabled = true;
-            btn.style.background = "#555";
-            btn.style.color = "#aaa";
-            setTimeout(() => addMessage("Dobrá opička. Ale zítra chci víc.", false), 1500);
-        };
-
-        function sendMessage() {
-            const text = chatInput.value.trim();
-            if (!text) return;
-            
-            addMessage(text, true);
-            chatInput.value = '';
-            messageCount++;
-
-            setTimeout(() => {
-                // Po 3 zprávách začne opice vydírat uživatele
-                if (messageCount === 3) {
-                    addExtortion();
-                } else {
-                    addMessage(monkeyReplies[Math.floor(Math.random() * monkeyReplies.length)], false);
-                }
-            }, 800 + Math.random() * 1200);
-        }
-
-        chatInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    </script>
+    <script src="chat.js"></script>
 </body>
 </html>
