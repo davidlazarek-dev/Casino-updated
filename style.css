@@ -1,162 +1,545 @@
-/* --- 1. Animace --- */
-@keyframes spin {
-    0% { transform: translateY(-5px); filter: blur(1px); opacity: 0.8; }
-    25% { transform: translateY(5px); }
-    50% { transform: translateY(-8px); filter: blur(2px); }
-    75% { transform: translateY(8px); }
-    100% { transform: translateY(0px); filter: blur(1px); opacity: 0.8; }
+/* ==========================================================================
+   DAVIDOVY AUTOMATY - ULTRA COMPLEX CYBER-MONKEY EDITION
+   ========================================================================== */
+
+/* --- 1. POKROČILÉ CSS PROMĚNNÉ --- */
+:root {
+    /* Paleta */
+    --void-bg: #050505;
+    --cyber-black: #0a0b10;
+    --neon-gold: #ffd700;
+    --neon-gold-glow: rgba(255, 215, 0, 0.6);
+    --neon-green: #00ff66;
+    --neon-green-glow: rgba(0, 255, 102, 0.6);
+    --neon-red: #ff003c;
+    --neon-red-glow: rgba(255, 0, 60, 0.6);
+    --glass-panel: rgba(15, 17, 26, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    
+    /* Typografie */
+    --font-heading: 'Montserrat', system-ui, sans-serif;
+    --font-body: 'Poppins', system-ui, sans-serif;
+    
+    /* Matematika a efekty */
+    --base-spacing: clamp(10px, 2vw, 20px);
+    --panel-radius: 24px;
+    --button-radius: 12px;
+    --transition-smooth: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-@keyframes land {
-    0% { transform: translateY(-20px); opacity: 0.5; }
-    100% { transform: translateY(0); opacity: 1; }
-}
-
-/* --- 2. Hlavni nastaveni a Pozadi --- */
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('https://cdn.pixabay.com/photo/2016/06/09/20/38/minions-1446594_1280.jpg') center/cover fixed;
+/* --- 2. RESET A ZÁKLAD --- */
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
-    color: #fff;
-    min-height: 100vh;
+    padding: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* --- 3. Navigacni menu --- */
-.navbar {
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--void-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--neon-gold);
+    border-radius: 10px;
+}
+
+/* --- 3. ANIMOVANÉ POZADÍ A CRT EFEKT --- */
+body {
+    background-color: var(--void-bg);
+    color: #e2e8f0;
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Kybernetický grid na pozadí */
+body::before {
+    content: '';
     position: fixed;
-    top: 0; left: 0; width: 100%;
-    background: rgba(20, 20, 28, 0.95);
-    backdrop-filter: blur(10px);
-    display: flex; justify-content: center; gap: 15px; padding: 15px 0;
-    z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    border-bottom: 2px solid #ffc107;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-image: 
+        linear-gradient(var(--glass-border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+    animation: gridMove 20s linear infinite;
+    z-index: -2;
+    opacity: 0.3;
+}
+
+/* CRT Scanlines - efekt staré televize */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+}
+
+/* --- 4. GLASSMORPHISM NAVIGACE --- */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 11, 16, 0.7);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: var(--base-spacing);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
 
 .nav-btn {
-    background: transparent; color: #fff; border: 2px solid #444;
-    padding: 10px 20px; border-radius: 8px;
-    font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.9rem;
-    cursor: pointer; transition: all 0.2s; text-decoration: none;
+    position: relative;
+    background: transparent;
+    color: #8b9bb4;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: var(--transition-smooth);
 }
-.nav-btn:hover { background: #ffc107; color: #000; border-color: #ffc107; transform: translateY(-2px); }
-.nav-btn.active { background: #ffc107; color: #000; border-color: #ffc107; }
 
-/* --- 4. Layout Stranek --- */
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    width: 0; height: 2px;
+    background: var(--neon-gold);
+    transition: var(--transition-smooth);
+    transform: translateX(-50%);
+}
+
+.nav-btn:hover {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.nav-btn:hover::before { width: 80%; }
+
+.nav-btn.active {
+    color: var(--neon-gold);
+    background: rgba(255, 215, 0, 0.05);
+    text-shadow: 0 0 15px var(--neon-gold-glow);
+}
+.nav-btn.active::before { width: 100%; box-shadow: 0 0 10px var(--neon-gold); }
+
+/* --- 5. HLAVNÍ PANEL S HOLOGRAFICKÝM OKRAJEM --- */
 .page-layout {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100vh; padding: 100px 20px 40px 20px; box-sizing: border-box;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: calc(var(--base-spacing) * 2);
+    perspective: 1000px;
 }
 
-/* --- 5. Spolecne panely --- */
 .panel-container {
-    background: linear-gradient(180deg, #2c2c38 0%, #1a1a24 100%);
-    border-radius: 20px; border: 4px solid #444;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.1);
-    width: 100%; max-width: 450px; padding: 25px; box-sizing: border-box;
+    background: var(--glass-panel);
+    backdrop-filter: blur(15px);
+    border-radius: var(--panel-radius);
+    padding: clamp(20px, 5vw, 50px);
+    width: 100%;
+    max-width: 650px;
+    position: relative;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 1),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        inset 0 -1px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--glass-border);
+    transform-style: preserve-3d;
+    animation: floatPanel 6s ease-in-out infinite;
 }
 
-.header { text-align: center; margin-bottom: 25px; }
+/* Zářící aura za panelem */
+.panel-container::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: linear-gradient(45deg, var(--neon-red), var(--neon-gold), var(--neon-green), #00d4ff);
+    z-index: -1;
+    border-radius: calc(var(--panel-radius) + 2px);
+    filter: blur(20px);
+    opacity: 0.15;
+    animation: gradientShift 10s linear infinite;
+}
+
+/* --- 6. HLAVIČKA A TYPOGRAFIE --- */
+.header { text-align: center; margin-bottom: 35px; transform: translateZ(30px); }
+
 .header h1 {
-    font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2.2rem; margin: 0;
-    background: linear-gradient(to bottom, #ffe259, #ffa751);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    text-shadow: 0px 4px 15px rgba(255, 167, 81, 0.4); letter-spacing: 2px;
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: clamp(2rem, 6vw, 3rem);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    background: linear-gradient(to bottom, #ffffff 0%, var(--neon-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0px 4px 10px var(--neon-gold-glow));
+    position: relative;
 }
-.subtitle { font-size: 0.8rem; color: #888; letter-spacing: 1px; margin-top: 5px; }
 
-.status-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+.subtitle {
+    color: #64748b;
+    font-size: 0.85rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-top: 8px;
+}
+
+/* --- 7. STATUS BAR (NEONOVÉ DISPLEJE) --- */
+.status-bar {
+    display: flex;
+    background: #000;
+    border-radius: 16px;
+    padding: 2px;
+    margin-bottom: 30px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,1);
+    transform: translateZ(20px);
+}
+
 .status-box {
-    background: #15151c; border: 2px solid #333; border-radius: 12px;
-    padding: 10px; flex: 1; text-align: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    flex: 1;
+    text-align: center;
+    background: linear-gradient(180deg, #12141c 0%, #0a0b10 100%);
+    padding: 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.03);
 }
-.status-label { font-size: 0.7rem; color: #888; letter-spacing: 1px; }
-.status-val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.5rem; }
-.val-good { color: #ffc107; }
-.val-bad { color: #ff4b2b; }
 
-/* --- 6. Automat --- */
+.status-box:first-child { margin-right: 2px; }
+
+.status-label {
+    font-size: 0.65rem;
+    color: #64748b;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.status-val {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-shadow: 0 0 15px currentColor;
+}
+
+.val-good { color: var(--neon-green); }
+.val-bad { color: var(--neon-red); }
+
+/* --- 8. 3D AUTOMATY (VÁLCE) --- */
 .reels-window {
-    background: #0a0a0d; border-radius: 15px; padding: 20px; border: 3px solid #111;
-    box-shadow: inset 0 10px 20px rgba(0,0,0,0.8); margin-bottom: 20px;
+    background: #020203;
+    border-radius: 20px;
+    padding: 25px 20px;
+    margin-bottom: 30px;
+    border: 4px solid #1a1c23;
+    border-bottom-width: 10px;
+    border-top-color: #0a0b10;
+    box-shadow: 
+        inset 0 20px 30px rgba(0,0,0,0.9),
+        0 10px 20px rgba(0,0,0,0.5);
+    position: relative;
+    transform: translateZ(40px);
 }
-.reels { display: flex; justify-content: space-between; }
+
+.reels {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #111;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: inset 0 0 50px rgba(0,0,0,1);
+    position: relative;
+}
+
+/* Ryska s laserovým efektem */
+.reels::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; width: 100%; height: 2px;
+    background: var(--neon-red);
+    box-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
+    transform: translateY(-50%);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
 .reel {
-    width: 30%; aspect-ratio: 3/4; background: linear-gradient(180deg, #e6e6e6 0%, #ffffff 50%, #e6e6e6 100%);
-    border-radius: 10px; display: flex; justify-content: center; align-items: center;
-    font-size: 4rem; color: #000; box-shadow: inset 0 5px 10px rgba(0,0,0,0.3), 0 5px 15px rgba(0,0,0,0.5);
-    border: 1px solid #999;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    width: clamp(60px, 15vw, 90px);
+    height: clamp(80px, 20vw, 110px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #999 0%, #fff 20%, #fff 80%, #555 100%);
+    border-radius: 10px;
+    box-shadow: 
+        inset 0 15px 20px rgba(0,0,0,0.6),
+        inset 0 -15px 20px rgba(0,0,0,0.6),
+        0 5px 15px rgba(0,0,0,0.5);
+    color: #000;
+    position: relative;
+    overflow: hidden;
 }
-.reel.spinning { animation: spin 0.1s linear infinite; }
-.reel.landed { animation: land 0.3s ease-out; }
+
+/* Efekt zakřivení skla přes válce */
+.reel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+}
+
+.reel.spinning {
+    animation: hyperSpin 0.08s linear infinite;
+    filter: blur(3px) contrast(1.2);
+    color: transparent;
+    text-shadow: 0 0 15px rgba(0,0,0,0.8);
+}
+
+.reel.landed {
+    animation: mechanicalBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- 9. HOLOGRAFICKÁ TLAČÍTKA --- */
+.btn-primary, .btn-secondary, .btn-repay {
+    width: 100%;
+    padding: 20px;
+    border: none;
+    border-radius: var(--button-radius);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    z-index: 1;
+    transform: translateZ(30px);
+}
 
 .btn-primary {
-    background: linear-gradient(180deg, #ff416c, #ff4b2b); color: white; border: none;
-    border-radius: 12px; font-family: 'Montserrat', sans-serif; font-weight: 900;
-    font-size: 1.5rem; padding: 15px 0; cursor: pointer; width: 100%;
-    box-shadow: 0 6px 0 #c2211f, 0 10px 20px rgba(255, 75, 43, 0.4); transition: all 0.1s; margin-bottom: 10px;
+    background: linear-gradient(90deg, #cc9900, var(--neon-gold), #cc9900);
+    background-size: 200% auto;
+    color: #000;
+    box-shadow: 
+        0 8px 0 #806000, 
+        0 15px 30px var(--neon-gold-glow);
+    animation: shimmerBg 3s linear infinite;
 }
-.btn-primary:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0px 0 #c2211f; }
-.btn-primary:disabled { background: #555; box-shadow: 0 6px 0 #333; cursor: not-allowed; color: #888; }
 
-.message-box { background: #15151c; border: 1px solid #333; border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 20px; }
-#message { margin: 0; font-weight: 700; font-size: 1rem; color: #aaa; }
-#message.win { color: #4CAF50; text-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
-#message.lose { color: #ff4b2b; }
+.btn-primary::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    transform: skewX(-20deg);
+    animation: btnShine 4s infinite;
+    z-index: -1;
+}
 
-.rules { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; }
-.rules h3 { margin: 0 0 10px 0; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; color: #888; text-align: center; letter-spacing: 2px; }
-.payout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem; }
-.payout-item { display: flex; justify-content: space-between; background: #1a1a24; padding: 8px 12px; border-radius: 6px; border: 1px solid #2a2a35; }
-.prize { color: #ffc107; font-weight: bold; }
+.btn-primary:active:not(:disabled) {
+    transform: translateZ(30px) translateY(8px);
+    box-shadow: 0 0px 0 #806000, 0 5px 10px rgba(255,215,0,0.4);
+}
 
-/* --- 7. Banka CSS --- */
-.chimp-image { font-size: 6rem; text-align: center; margin: -10px 0 10px 0; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
-.bank-quote { text-align: center; font-style: italic; color: #aaa; margin-bottom: 20px; background: #111; padding: 15px; border-radius: 10px; border-left: 4px solid #ff4b2b; }
-.btn-bank { background: linear-gradient(180deg, #11998e, #38ef7d); box-shadow: 0 6px 0 #0d7a71; margin-bottom: 15px; }
-.btn-bank:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0px 0 #0d7a71; }
-.btn-pay { background: linear-gradient(180deg, #f7b733, #fc4a1a); box-shadow: 0 6px 0 #c23912; }
-.btn-pay:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0px 0 #c23912; }
+.btn-primary:disabled {
+    background: #222;
+    color: #555;
+    box-shadow: 0 8px 0 #111;
+    animation: none;
+    cursor: not-allowed;
+}
 
-/* --- 8. Pomoc CSS --- */
-.help-content { text-align: center; line-height: 1.6; }
-.help-icon { font-size: 4rem; margin-bottom: 15px; }
-.warning-text { color: #ff4b2b; font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; }
-.help-list { text-align: left; background: #15151c; padding: 20px 20px 20px 40px; border-radius: 10px; margin-bottom: 20px; }
-.hotline { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #4CAF50; background: #111; padding: 15px; border-radius: 10px; border: 2px dashed #4CAF50;}
-.about-me { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; font-style: italic; letter-spacing: 1px; }
+/* Splácení dluhu */
+.repay-container { margin-bottom: 25px; }
+.btn-repay {
+    background: var(--neon-green);
+    color: #000;
+    padding: 15px;
+    font-size: 1rem;
+    box-shadow: 0 6px 0 #008033, 0 10px 20px var(--neon-green-glow);
+}
+.btn-repay:active:not(:disabled) {
+    transform: translateZ(30px) translateY(6px);
+    box-shadow: 0 0px 0 #008033;
+}
+.btn-repay:disabled {
+    background: #1a2620; color: #334d3d; box-shadow: 0 6px 0 #0d1411;
+}
 
-/* --- 9. Toast Zpravy --- */
+/* --- 10. INFORMAČNÍ A VÝHERNÍ PANELY --- */
+.message-box {
+    margin: 30px 0;
+    text-align: center;
+    min-height: 28px;
+    transform: translateZ(25px);
+}
+
+#message {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+.win { 
+    color: var(--neon-gold); 
+    text-shadow: 0 0 20px var(--neon-gold), 0 0 40px var(--neon-gold); 
+    animation: jackpotPulse 0.5s alternate infinite; 
+}
+.lose { color: var(--neon-red); text-shadow: 0 0 15px var(--neon-red); }
+
+.rules {
+    background: rgba(0,0,0,0.4);
+    border-radius: 16px;
+    padding: 25px;
+    border: 1px solid var(--glass-border);
+    transform: translateZ(15px);
+}
+
+.rules h3 {
+    text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 20px; letter-spacing: 4px;
+}
+
+.payout-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+}
+
+.payout-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.03); padding: 12px 20px; border-radius: 10px;
+    border-left: 3px solid var(--neon-gold);
+    transition: var(--transition-smooth);
+}
+.payout-item:hover {
+    background: rgba(255,215,0,0.1); transform: translateX(5px);
+}
+
+.prize { color: var(--neon-gold); font-weight: 900; font-size: 1.1rem; text-shadow: 0 0 10px var(--neon-gold-glow); }
+
+/* --- 11. BANKA SPECIFICKÉ --- */
+.bank-actions { display: flex; flex-direction: column; gap: 25px; }
+.action-card {
+    background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 30px; text-align: center;
+    position: relative; overflow: hidden;
+}
+.action-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-red), transparent);
+}
+.action-card h3 { color: #fff; margin-bottom: 15px; font-family: var(--font-heading); font-size: 1.5rem; }
+.action-card p { color: #8b9bb4; margin-bottom: 25px; font-size: 1rem; line-height: 1.6; }
+.action-card strong { color: var(--neon-gold); font-size: 1.2rem; }
+
+.btn-secondary { background: #1a1c23; color: #fff; box-shadow: 0 8px 0 #0a0b10; }
+.btn-secondary:active:not(:disabled) { transform: translateY(8px); box-shadow: 0 0 0 #0a0b10; }
+
+/* --- 12. NOTIFIKACE (CHIMP TOAST) --- */
 .chimp-toast {
-    position: fixed; bottom: -150px; right: 20px; width: 300px;
-    background: #1a1a24; border: 2px solid #ff4b2b; border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 2000;
-    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex; flex-direction: column; overflow: hidden;
+    position: fixed; bottom: -120px; right: 30px;
+    background: rgba(15, 5, 5, 0.95); backdrop-filter: blur(10px);
+    border: 1px solid var(--neon-red); border-left: 5px solid var(--neon-red);
+    border-radius: 8px; padding: 20px; width: 350px;
+    box-shadow: 0 15px 40px rgba(255, 0, 60, 0.4);
+    transition: bottom 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 1000;
 }
-.chimp-toast.show { bottom: 20px; }
-.toast-header { background: #ff4b2b; color: #fff; padding: 8px 12px; font-weight: bold; font-size: 0.9rem; }
-.toast-body { padding: 15px; color: #ddd; font-size: 0.95rem; font-style: italic; }
+.chimp-toast.show { bottom: 30px; animation: glitchBorder 2s infinite; }
+.toast-header { color: var(--neon-red); font-weight: 900; font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; }
+.toast-body { color: #fff; font-size: 1rem; line-height: 1.4; }
 
-/* --- 10. Chat (Seznamka) --- */
-.chat-app { background: #ffe6eb; color: #333; border-radius: 20px; padding: 20px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); text-align: center; border: 5px solid #ff4b8b; }
-.chat-title { font-family: 'Comic Sans MS', cursive; color: #ff4b8b; font-size: 2.2rem; margin: 0 0 10px 0; font-weight: 900;}
-.chat-profile-name { font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; }
-.chat-img { width: 100%; border-radius: 15px; border: 3px solid #ff4b8b; margin-bottom: 15px; }
-.chat-bubble { background: #fff; padding: 15px; border-radius: 15px; text-align: left; font-style: italic; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; border-bottom-left-radius: 0; }
-.btn-chat { background: #ff4b8b; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px; box-shadow: 0 4px 0 #c21a5b; }
-.btn-chat:active { transform: translateY(4px); box-shadow: 0 0px 0 #c21a5b; }
-.btn-escape { background: #555; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold;}
+/* --- 13. EXTRÉMNÍ VIRUS REKLAMY (CYBER-SCAM) --- */
+.fake-ad {
+    position: absolute; pointer-events: auto;
+    background: #000; border: 4px solid var(--neon-green);
+    color: #fff; font-family: 'Courier New', Courier, monospace; font-weight: 900;
+    padding: 25px; text-align: center;
+    box-shadow: 15px 15px 0px rgba(0, 255, 102, 0.3);
+    animation: extremeGlitch 0.2s infinite;
+    max-width: 320px; z-index: 9999;
+}
+.fake-ad::before {
+    content: 'WARNING // VIRUS DETECTED'; position: absolute; top: -12px; left: 10px;
+    background: var(--neon-green); color: #000; font-size: 0.7rem; padding: 2px 10px;
+}
+.fake-ad .close-btn {
+    position: absolute; top: -15px; right: -15px;
+    background: var(--neon-red); color: white; border: none; border-radius: 0;
+    width: 35px; height: 35px; font-weight: 900; font-size: 1.2rem; cursor: pointer;
+    box-shadow: 4px 4px 0 #000; transition: 0.1s;
+}
+.fake-ad .close-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #000; }
+.fake-ad .chat-btn {
+    margin-top: 20px; background: transparent; color: var(--neon-green);
+    border: 2px dashed var(--neon-green); padding: 12px; font-weight: 900;
+    width: 100%; cursor: pointer; text-transform: uppercase; transition: 0.2s;
+}
+.fake-ad .chat-btn:hover { background: var(--neon-green); color: #000; }
 
-/* --- 11. Hack/Glitch --- */
-@keyframes jitter-mild {
-    0% { transform: translate(0, 0); } 25% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 1px); } 75% { transform: translate(-2px, 0px); } 100% { transform: translate(0, 0); }
+/* --- 14. KOMPLEXNÍ KEYFRAME ANIMACE --- */
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 0 40px; } }
+@keyframes gradientShift { 0% { filter: hue-rotate(0deg) blur(20px); } 100% { filter: hue-rotate(360deg) blur(20px); } }
+@keyframes floatPanel { 0%, 100% { transform: translateY(0) rotateX(2deg); } 50% { transform: translateY(-10px) rotateX(-2deg); } }
+@keyframes shimmerBg { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+@keyframes btnShine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+@keyframes hyperSpin { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
+@keyframes mechanicalBounce { 0% { transform: translateY(-40px); filter: blur(2px); } 40% { transform: translateY(10px); } 70% { transform: translateY(-5px); } 100% { transform: translateY(0); filter: blur(0); } }
+@keyframes jackpotPulse { 0% { transform: scale(1); text-shadow: 0 0 20px var(--neon-gold); } 100% { transform: scale(1.1); text-shadow: 0 0 40px var(--neon-gold), 0 0 60px #fff; } }
+@keyframes glitchBorder { 0%, 100% { border-color: var(--neon-red); transform: translate(0); } 20% { border-color: #fff; transform: translate(-2px, 1px); } 40% { border-color: var(--neon-red); transform: translate(2px, -1px); } 60% { border-color: transparent; transform: translate(-1px, 2px); } 80% { border-color: var(--neon-red); transform: translate(1px, -2px); } }
+@keyframes extremeGlitch { 0% { transform: translate(2px, 2px) skew(2deg); filter: hue-rotate(0deg); } 25% { transform: translate(-2px, -2px) skew(-2deg); filter: hue-rotate(90deg); } 50% { transform: translate(-2px, 2px) skew(0deg); filter: invert(1); } 75% { transform: translate(2px, -2px) skew(2deg); filter: invert(0); } 100% { transform: translate(0, 0) skew(0deg); } }
+
+/* --- 15. RESPONZIVITA (MEDIA QUERIES) --- */
+@media (max-width: 768px) {
+    .page-layout { padding: var(--base-spacing); }
+    .panel-container { padding: 25px; }
+    .payout-grid { grid-template-columns: 1fr; }
+    .reels { padding: 10px; }
+    .reel { font-size: 2.5rem; width: 65px; height: 85px; }
+    .status-val { font-size: 1.8rem; }
 }
-@keyframes jitter-extreme {
-    0% { transform: translate(0, 0) skew(0deg); filter: hue-rotate(0deg); } 20% { transform: translate(-5px, 5px) skew(5deg); filter: hue-rotate(90deg); }
-    40% { transform: translate(5px, -5px) skew(-5deg); filter: contrast(200%); } 60% { transform: translate(-5px, -5px) skew(2deg); filter: invert(100%); }
-    80% { transform: translate(5px, 5px) skew(-2deg); filter: blur(2px); } 100% { transform: translate(0, 0) skew(0deg); filter: hue-rotate(0deg); }
+
+@media (max-width: 480px) {
+    .navbar { flex-wrap: wrap; gap: 8px; padding: 10px; }
+    .nav-btn { flex: 1 1 calc(50% - 8px); font-size: 0.7rem; padding: 8px; text-align: center; }
+    .btn-primary, .btn-secondary, .btn-repay { font-size: 1rem; padding: 15px; }
+    .chimp-toast { width: calc(100vw - 40px); right: 20px; }
 }
-@keyframes flashAd { 0%, 100% { background: #ff00ff; color: #ffff00; } 50% { background: #00ffff; color: #ff0000; } }
-.fake-ad { position: fixed; padding: 15px; border: 5px solid #fff; font-family: 'Comic Sans MS', 'Arial', sans-serif; font-weight: 900; font-size: 1.2rem; text-align: center; z-index: 9999; box-shadow: 0 0 20px rgba(0,0,0,0.8); animation: flashAd 0.15s infinite; pointer-events: none; }
-.fake-ad button.chat-btn { margin-top: 10px; padding: 10px; font-size: 1rem; font-weight: bold; background: yellow; color: red; border: 2px solid red; cursor: crosshair; pointer-events: auto; }
-.fake-ad button.close-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; border: 2px solid white; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; pointer-events: auto; box-shadow: 0 0 5px black; }
+
+/* Redukce pohybu pro uživatele s nastavením accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
