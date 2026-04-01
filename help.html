@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomoc - Davidovy Automaty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <button class="nav-btn" onclick="navigate('index.html')">🏠 Automaty</button>
+        <button class="nav-btn" onclick="navigate('bank.html')">🦍 Banka</button>
+        <button class="nav-btn active" onclick="navigate('help.html')">🆘 Pomoc</button>
+    </nav>
+
+    <div class="page-layout">
+        <div class="panel-container">
+            <div class="header">
+                <h1>ZÁVISLOST</h1>
+                <div class="subtitle">Zodpovědné hraní</div>
+            </div>
+
+            <div class="help-content">
+                <div class="help-icon">⚠️</div>
+                <div class="warning-text">Hazard může způsobit závislost!</div>
+                
+                <p style="color: #aaa; font-size: 0.9rem;">Hraní na automatech má být zábava, ne způsob, jak vydělat peníze (nebo banány). Pokud máte pocit, že ztrácíte kontrolu, je čas přestat.</p>
+                
+                <ul class="help-list">
+                    <li>Nikdy nehrajte za půjčené peníze (Šimpanz neodpouští).</li>
+                    <li>Stanovte si předem limit, kolik můžete prohrát.</li>
+                    <li>Dělejte si pravidelné přestávky.</li>
+                    <li>Nesnažte se "dohnat" své prohry.</li>
+                </ul>
+
+                <p style="color: #888; font-size: 0.8rem; margin-bottom: 5px;">Potřebujete pomoc? Zkuste Národní linku pro odvykání:</p>
+                <div class="hotline">📞 800 315 315</div>
+            </div>
+            
+            <button class="btn-primary" style="margin-top: 20px;" onclick="navigate('index.html')">Zpět do bezpečí (Domů)</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let wallet = parseInt(urlParams.get('wallet')) ?? 100;
+        let debt = parseInt(urlParams.get('debt')) ?? 0;
+        let spinsInDebt = parseInt(urlParams.get('spins')) ?? 0;
+        let loanCount = parseInt(urlParams.get('loans')) ?? 0;
+
+        function navigate(page) {
+            window.location.href = `${page}?wallet=${wallet}&debt=${debt}&spins=${spinsInDebt}&loans=${loanCount}`;
+        }
+    </script>
+</body>
+</html>
