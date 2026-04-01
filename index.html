@@ -3,71 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Davidovy Automaty | Cyber-Monkey Edition</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Montserrat:wght@800;900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Terminal Velocity | Cyber-Monkey Casino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="navbar" aria-label="Main Navigation">
-        <button class="nav-btn active" id="nav-casino">Kasino</button>
-        <button class="nav-btn" id="nav-bank">Banka (Dluhy)</button>
-        <button class="nav-btn" id="nav-chat">Chimp Finder</button>
+    <div id="start-overlay" class="start-overlay">
+        <div class="start-content">
+            <h1 class="glitch-text" data-text="VAROVÁNÍ">VAROVÁNÍ</h1>
+            <p>Tento web obsahuje hazard, opice a viry.<br>Zapni si zvuk a vstup na vlastní nebezpečí.</p>
+            <button id="enter-btn" class="action-btn warning">VSTOUPIT DO KASINA</button>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <button class="nav-btn active" data-target="casino">KASINO</button>
+        <button class="nav-btn" data-target="bank">BANKA (DLUHY)</button>
+        <button class="nav-btn" onclick="window.location.href='chat.html'">🔥 CHIMPINDER 🔥</button>
     </nav>
 
-    <main class="page-layout">
-        <div class="panel-container" id="main-panel">
-            <header class="header">
-                <h1>Davidovy Automaty</h1>
-                <p class="subtitle">Terminal Velocity // Build 3.0</p>
-            </header>
-
-            <section class="status-bar" aria-label="Player Status">
-                <div class="status-box">
-                    <div class="status-label">Zůstatek (Kč)</div>
-                    <div class="status-val val-good" id="money-display">1000</div>
-                </div>
-                <div class="status-box">
-                    <div class="status-label">Dluh (Kč)</div>
-                    <div class="status-val val-bad" id="debt-display">0</div>
-                </div>
-            </section>
-
-            <section class="reels-window" aria-label="Slot Machine Reels">
-                <div class="reels" id="reels-container">
+    <main id="app-container">
+        <section id="casino" class="screen active">
+            <h1 class="glitch-text" data-text="SLOT MACHINE">SLOT MACHINE</h1>
+            <div class="slot-machine">
+                <div class="reels-container">
                     <div class="reel" id="reel1">🦍</div>
-                    <div class="reel" id="reel2">🍌</div>
-                    <div class="reel" id="reel3">💎</div>
+                    <div class="reel" id="reel2">🦍</div>
+                    <div class="reel" id="reel3">🦍</div>
                 </div>
-            </section>
+                <button id="spin-btn" class="action-btn">SPIN (10 🍌)</button>
+            </div>
+            <div class="stats">
+                <div class="stat-box success">Zůstatek: <span id="balance">1000</span> 🍌</div>
+            </div>
+            <div id="message-log" class="terminal-log">Systém online. Čekám na sázky...</div>
+        </section>
 
-            <section class="controls" aria-label="Game Controls">
-                <button class="btn-primary" id="spin-btn">Spin (100 Kč)</button>
-                <div class="repay-container">
-                    <button class="btn-repay" id="repay-btn" disabled>Splátka Dluhu (500 Kč)</button>
-                </div>
-            </section>
-
-            <div class="message-box" aria-live="polite">
-                <div id="message">Připraven. Zmáčkni Spin.</div>
+        <section id="bank" class="screen">
+            <h1 class="glitch-text" data-text="UNDERGROUND BANKA">UNDERGROUND BANKA</h1>
+            <p class="subtitle">Úrok 5% každou minutu.</p>
+            
+            <div class="stats bank-stats">
+                <div class="stat-box success">Zůstatek<br><span id="bank-balance">1000</span> 🍌</div>
+                <div class="stat-box danger">Dluh<br><span id="bank-debt">0</span> 🍌</div>
             </div>
 
-            <section class="rules">
-                <h3>Výherní Tabulka</h3>
-                <div class="payout-grid">
-                    <div class="payout-item"><span>3x 💎 (Diamant)</span><span class="prize">10 000 Kč</span></div>
-                    <div class="payout-item"><span>3x 🦍 (Gorila)</span><span class="prize">5 000 Kč</span></div>
-                    <div class="payout-item"><span>3x 🍌 (Banán)</span><span class="prize">1 500 Kč</span></div>
-                    <div class="payout-item"><span>3x 🍒 (Třešně)</span><span class="prize">500 Kč</span></div>
-                </div>
-            </section>
-        </div>
+            <div class="loan-panel">
+                <h3>Rychlá Půjčka</h3>
+                <p>Půjč si 5000 🍌 ihned. Na následky se neptej.</p>
+                <button id="loan-btn" class="action-btn warning" style="margin-bottom: 15px;">PŮJČIT 5000 🍌</button>
+                <button id="repay-btn" class="action-btn success">SPLATIT DLUH (VŠE)</button>
+            </div>
+        </section>
     </main>
 
-    <div id="ad-container"></div>
-    <div id="toast-container"></div>
-
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>
