@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davidovy Automaty</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <button class="nav-btn active" onclick="navigate('index.html')">🏠 Automaty</button>
+        <button class="nav-btn" onclick="navigate('bank.html')">🦍 Banka</button>
+        <button class="nav-btn" onclick="navigate('help.html')">🆘 Pomoc</button>
+        <button class="nav-btn" onclick="window.location.href='cpp.html'">🐺 Svatyně (Čtvrtletka)</button>
+    </nav>
+
+    <div class="page-layout">
+        <div class="panel-container">
+            <div class="header">
+                <h1>DAVIDOVY AUTOMATY</h1>
+                <div class="subtitle">davidlazarek.github.io</div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-box">
+                    <div class="status-label">K DISPOZICI</div>
+                    <div class="status-val val-good"><span class="wallet-display">100</span> 🍌</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">DLUH U ŠIMPANZE</div>
+                    <div class="status-val val-bad"><span class="debt-display">0</span> 🍌</div>
+                </div>
+            </div>
+
+            <div class="reels-window">
+                <div class="reels">
+                    <div class="reel" id="reel1">🍌</div>
+                    <div class="reel" id="reel2">🍌</div>
+                    <div class="reel" id="reel3">🍌</div>
+                </div>
+            </div>
+
+            <button id="spin-button" class="btn-primary">ZATOČIT (Cena: 5🍌)</button>
+            
+            <div class="message-box">
+                <p id="message">Vítej! Klikni na "Zatočit" pro hru.</p>
+            </div>
+
+            <div class="rules">
+                <h3>VÝHRY</h3>
+                <div class="payout-grid">
+                    <div class="payout-item"><span>🍌 🍌 🍌</span> <span class="prize">+100</span></div>
+                    <div class="payout-item"><span>🍒 🍒 🍒</span> <span class="prize">+25</span></div>
+                    <div class="payout-item"><span>🍋 🍋 🍋</span> <span class="prize">+25</span></div>
+                    <div class="payout-item"><span>🔔 🔔 🔔</span> <span class="prize">+25</span></div>
+                    <div class="payout-item"><span>⭐ ⭐ ⭐</span> <span class="prize">+25</span></div>
+                    <div class="payout-item"><span>Jakékoliv dva 🍌</span> <span class="prize">+10</span></div>
+                </div>
+            </div>
+            <div class="about-me">Mám rád automaty :)</div>
+        </div>
+    </div>
+
+    <div id="chimp-toast" class="chimp-toast">
+        <div class="toast-header">📩 Zpráva od: Šimpanz</div>
+        <div class="toast-body" id="toast-message">...</div>
+    </div>
+
+    <div id="hacked-ads-container">
+        <div class="fake-ad" id="ad-error" style="display:none; bottom: 20%; left: 5%; animation: flashAd 0.1s infinite reverse; transform: rotate(-5deg);">
+            ⚠️ KRITICKÁ CHYBA: TVŮJ DISK JE PRÁVĚ FORMÁTOVÁN LIDOOPEM ⚠️<br>
+            STAHUJI VŠECHNY TVÉ OSOBNÍ FOTKY... 99% HOTOVO.
+        </div>
+    </div>
+
+    <script>
+        // Nacteni stavu z URL pro multi-page hru - OPRAVENO NaN!
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        let wallet = parseInt(urlParams.get('wallet'));
+        wallet = isNaN(wallet) ? 100 : wallet;
+        
+        let debt = parseInt(urlParams.get('debt'));
+        debt = isNaN(debt) ? 0 : debt;
+        
+        let spinsInDebt = parseInt(urlParams.get('spins'));
+        spinsInDebt = isNaN(spinsInDebt) ? 0 : spinsInDebt;
+        
+        let loanCount = parseInt(urlParams.get('loans'));
+        loanCount = isNaN(loanCount) ? 0 : loanCount;
+
+        function navigate(page) {
+            window.location.href = `${page}?wallet=${wallet}&debt=${debt}&spins=${spinsInDebt}&loans=${loanCount}`;
+        }
+
+        const SPIN_COST = 5;
+        const SYMBOLS = ['🍌', '🍒', '🍋', '🔔', '⭐'];
+        
+        const walletDisplays = document.querySelectorAll('.wallet-display');
+        const debtDisplays = document.querySelectorAll('.debt-display');
+        const reelElements = [document.getElementById("reel1"), document.getElementById("reel2"), document.getElementById("reel3")];
+        const spinButton = document.getElementById("spin-button");
+        const messageDisplay = document.getElementById("message");
+        
+        const chimpToast = document.getElementById("chimp-toast");
+        const toastMessage = document.getElementById("toast-message");
+        let toastTimeout;
+
+        const chimpThreats = {
+            3: "Hej kámo, nezapomněl jsi na něco? 🍌",
+            6: "Ten úrok ti roste před očima. Moje trpělivost ne. 🦍",
+            9: "Vím, kde bydlíš. A vím, že tam nemáš žádné banány.",
+            13: "Už posílám gorily. Radši koukej trefit jackpot.",
+            18: "Začínám si brousit mačetu. Zítra si přijdu pro ten tvůj mixér z kuchyně.",
+            25: "Tohle už nesplatíš. Od zítřka pracuješ pro mě v dole na slupky.",
+            35: "Právě jsem prodal tvoje auto za 10 banánů. Pěkná popelnice. Furt dlužíš.",
+            50: "Gorily právě stojí před tvými dveřmi. Radši neotvírej, beztak je rovnou vykopnou.",
+            75: "Zítra ráno se probudíš a v posteli najdeš uříznutou koňskou hlavu. Jen tě varuju.",
+            100: "Gratuluji. Dosáhl jsi bodu, kdy už tě ani nenechám zmlátit. Od teď patříš do zoo a já vybírám vstupné."
+        };
+
+        function showChimpToast(text) {
+            toastMessage.textContent = `"${text}"`;
+            chimpToast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { chimpToast.classList.remove('show'); }, 6000);
+        }
+
+        function createChimpAd() {
+            const ad = document.createElement('div');
+            ad.className = 'fake-ad';
+            ad.style.top = Math.floor(Math.random() * 70) + 10 + "%";
+            ad.style.left = Math.floor(Math.random() * 70) + 10 + "%";
+            ad.style.transform = `rotate(${Math.floor(Math.random() * 40) - 20}deg)`;
+            
+            ad.innerHTML = `
+                <button class="close-btn">X</button>
+                🔥 ŽHAVÍ NEZADANÍ ŠIMPANZI<br>VE TVÉM OKOLÍ ČEKAJÍ<br>NA TVÉ BANÁNY! 🍌💦<br>
+                <button class="chat-btn">KLIKNI ZDE PRO CHAT</button>
+            `;
+
+            const handleClose = (e) => {
+                e.stopPropagation(); ad.remove();
+                createChimpAd(); createChimpAd();
+            };
+
+            ad.querySelector('.close-btn').addEventListener('click', handleClose);
+            ad.querySelector('.chat-btn').addEventListener('click', (e) => {
+                handleClose(e); 
+                navigate('chat.html'); // Otevre novou stranku seznamky!
+            });
+            document.getElementById('hacked-ads-container').appendChild(ad);
+        }
+
+        function updateGlitchEffects() {
+            const body = document.body;
+            const adError = document.getElementById("ad-error");
+            if (debt === 0) { body.style.animation = "none"; adError.style.display = "none"; return; }
+            if (spinsInDebt >= 15 && spinsInDebt < 30) { body.style.animation = "jitter-mild 0.5s infinite"; } 
+            else if (spinsInDebt >= 30 && spinsInDebt < 50) { body.style.animation = "jitter-mild 0.1s infinite"; } 
+            else if (spinsInDebt >= 50 && spinsInDebt < 75) { body.style.animation = "jitter-extreme 0.5s infinite"; adError.style.display = "block"; } 
+            else if (spinsInDebt >= 75) {
+                body.style.animation = "jitter-extreme 0.1s infinite"; adError.style.display = "block";
+                adError.style.bottom = Math.floor(Math.random() * 80) + "%"; adError.style.left = Math.floor(Math.random() * 80) + "%";
+            }
+        }
+
+        function updateAllDisplays() {
+            walletDisplays.forEach(el => el.textContent = wallet);
+            debtDisplays.forEach(el => el.textContent = debt);
+            debtDisplays.forEach(el => {
+                if (debt > 0) el.parentElement.style.color = "#ff4b2b";
+                else el.parentElement.style.color = "#888";
+            });
+        }
+
+        function spin() {
+            if (wallet < SPIN_COST) {
+                messageDisplay.textContent = "Nemáš banány! Běž si půjčit do Banky.";
+                messageDisplay.className = "lose"; return;
+            }
+            wallet -= SPIN_COST;
+            let interestApplied = 0;
+
+            if (debt > 0) {
+                spinsInDebt++;
+                let currentInterestRate = 0.05 + (spinsInDebt * 0.005); 
+                interestApplied = Math.floor(debt * currentInterestRate) + 1; 
+                debt += interestApplied;
+                if (chimpThreats[spinsInDebt]) showChimpToast(chimpThreats[spinsInDebt]);
+                updateGlitchEffects();
+            }
+            updateAllDisplays();
+            
+            spinButton.disabled = true;
+            messageDisplay.className = "";
+            messageDisplay.textContent = interestApplied > 0 ? `Točí se... (Dluh stoupl o ${interestApplied}🍌!)` : "Točí se...";
+            messageDisplay.style.color = interestApplied > 0 ? "#ff4b2b" : "#aaa";
+
+            const results = [SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)], SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)], SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]];
+
+            reelElements.forEach(reel => { reel.textContent = '✡️'; reel.classList.add('spinning'); reel.classList.remove('landed'); });
+
+            reelElements.forEach((reel, index) => {
+                setTimeout(() => {
+                    reel.classList.remove('spinning'); reel.textContent = results[index]; reel.classList.add('landed');
+                }, 1000 + (index * 500));
+            });
+
+            setTimeout(() => {
+                checkWin(results[0], results[1], results[2]); 
+                updateAllDisplays(); spinButton.disabled = false;
+            }, 1000 + (500 * 2) + 100);
+        }
+
+        function checkWin(r1, r2, r3) {
+            let payout = 0; let winMessage = "Zkus to znovu!";
+            messageDisplay.className = "lose"; messageDisplay.style.color = "";
+            if (r1 === r2 && r2 === r3) {
+                if (r1 === '🍌') { payout = 100; winMessage = "🍌 JACKPOT! 🍌 +100 Banánů!"; } 
+                else { payout = 25; winMessage = `Tři ${r1}! +25 Banánů!`; }
+            } else if ((r1 === '🍌' && r2 === '🍌') || (r1 === '🍌' && r3 === '🍌') || (r2 === '🍌' && r3 === '🍌')) {
+                payout = 10; winMessage = "Dva banány! +10 Banánů!";
+            }
+            wallet += payout; 
+            messageDisplay.textContent = winMessage;
+            if (payout > 0) messageDisplay.className = "win";
+        }
+
+        // Init pri nacteni
+        createChimpAd();
+        updateAllDisplays();
+        updateGlitchEffects();
+        spinButton.addEventListener("click", spin);
+    </script>
+</body>
+</html>
