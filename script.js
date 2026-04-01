@@ -1,198 +1,190 @@
-const SYMBOLS = ['🦍', '🍌', '💎', '🍒', '💣'];
-const PAYOUTS = { '💎': 10000, '🦍': 5000, '🍌': 1500, '🍒': 500 };
-const SPIN_COST = 100;
-const REPAY_AMOUNT = 500;
+// --- ELEMENTY Z HTML ---
+const startOverlay = document.getElementById('start-overlay');
+const enterBtn = document.getElementById('enter-btn');
+const navBtns = document.querySelectorAll('.nav-btn');
+const screens = document.querySelectorAll('.screen');
+const balanceEl = document.getElementById('balance');
+const bankBalanceEl = document.getElementById('bank-balance');
+const bankDebtEl = document.getElementById('bank-debt');
+const spinBtn = document.getElementById('spin-btn');
+const loanBtn = document.getElementById('loan-btn');
+const repayBtn = document.getElementById('repay-btn');
+const msgLog = document.getElementById('message-log');
+const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
 
-class GameState {
-    constructor() {
-        this.money = parseInt(localStorage.getItem('chimp_money')) || 1000;
-        this.debt = parseInt(localStorage.getItem('chimp_debt')) || 0;
-        this.updateDOM();
-    }
-    save() {
-        localStorage.setItem('chimp_money', this.money);
-        localStorage.setItem('chimp_debt', this.debt);
-        this.updateDOM();
-    }
-    addMoney(amt) { this.money += amt; this.save(); }
-    spendMoney(amt) {
-        if (this.money >= amt) { this.money -= amt; this.save(); return true; }
-        return false;
-    }
-    addDebt(amt) { this.debt += amt; this.money += amt; this.save(); }
-    repayDebt(amt) {
-        if (this.debt > 0 && this.money >= amt) {
-            const actualRepay = Math.min(this.debt, amt);
-            this.debt -= actualRepay;
-            this.money -= actualRepay;
-            this.save();
-        }
-    }
-    updateDOM() {
-        const mDisp = document.getElementById('money-display');
-        const dDisp = document.getElementById('debt-display');
-        if(mDisp) mDisp.textContent = this.money;
-        if(dDisp) dDisp.textContent = this.debt;
-        const repayBtn = document.getElementById('repay-btn');
-        if(repayBtn) repayBtn.disabled = (this.debt === 0 || this.money < REPAY_AMOUNT);
-    }
+// --- STAV HRY (Z LocalStorage, sdílí se s chatem) ---
+let balance = parseInt(localStorage.getItem('chimp_money')) || 1000;
+let debt = parseInt(localStorage.getItem('chimp_debt')) || 0;
+const spinCost = 10;
+const symbols = ['🦍', '🍌', '💀', '💎', '💩'];
+
+// --- AKTUALIZACE OBRAZOVKY ---
+function updateDisplay() {
+    balanceEl.textContent = balance;
+    bankBalanceEl.textContent = balance;
+    bankDebtEl.textContent = debt;
+    // Uložení stavu, aby o penězích věděli i opičáci v chatu
+    localStorage.setItem('chimp_money', balance);
+    localStorage.setItem('chimp_debt', debt);
 }
 
-class SlotMachine {
-    constructor(state, ui) {
-        this.state = state;
-        this.ui = ui;
-        this.isSpinning = false;
-        this.reels = [
-            document.getElementById('reel1'),
-            document.getElementById('reel2'),
-            document.getElementById('reel3')
-        ];
-        document.getElementById('spin-btn').addEventListener('click', () => this.spin());
-        document.getElementById('repay-btn').addEventListener('click', () => this.state.repayDebt(REPAY_AMOUNT));
-    }
+// --- TERMINÁLOVÉ ZPRÁVY ---
+function logMessage(msg) {
+    msgLog.innerHTML = `> ${msg}<br>` + msgLog.innerHTML;
+}
 
-    async spin() {
-        if (this.isSpinning) return;
-        if (!this.state.spendMoney(SPIN_COST)) {
-            this.ui.showToast('NEMÁŠ PRACHY', 'Běž do banky nebo si najdi práci. Opičí exekutor je na cestě.');
-            return;
-        }
+// --- ÚVODNÍ OBRAZOVKA (OBCHÁZÍ BLOKACI ZVUKŮ) ---
+enterBtn.addEventListener('click', () => {
+    startOverlay.style.display = 'none';
+    // Tady bys mohl spustit hudbu: bgMusic.play();
+    logMessage("Přístup povolen. Vítejte v undergroundu.");
+    updateDisplay();
+});
 
-        this.isSpinning = true;
-        this.ui.setMessage('Točím...', '');
+// --- PŘEPÍNÁNÍ ZÁLOŽEK ---
+navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Ignorujeme tlačítko Chimpinder, protože to je normální odkaz na chat.html
+        if(btn.innerText.includes("CHIMPINDER")) return; 
         
-        this.reels.forEach(r => {
-            r.classList.add('spinning');
-            r.classList.remove('landed');
-        });
+        navBtns.forEach(b => b.classList.remove('active'));
+        screens.forEach(s => s.classList.remove('active'));
+        
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+    });
+});
 
-        const results = [];
-        for (let i = 0; i < this.reels.length; i++) {
-            await new Promise(res => setTimeout(res, 800 + (i * 400)));
-            const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-            results.push(symbol);
-            this.reels[i].classList.remove('spinning');
-            void this.reels[i].offsetWidth; 
-            this.reels[i].classList.add('landed');
-            this.reels[i].textContent = symbol;
-        }
-
-        this.checkWin(results);
-        this.isSpinning = false;
+// --- HRACÍ AUTOMAT (SLOT MACHINE) ---
+spinBtn.addEventListener('click', () => {
+    if (balance < spinCost) {
+        logMessage("CHYBA: Nedostatek banánů! Vezmi si půjčku.");
+        return;
     }
 
-    checkWin(results) {
-        if (results[0] === results[1] && results[1] === results[2]) {
-            const winAmt = PAYOUTS[results[0]] || 0;
-            if (winAmt > 0) {
-                this.state.addMoney(winAmt);
-                this.ui.setMessage(`JACKPOT! +${winAmt} Kč`, 'win');
-                if(Math.random() > 0.5) AdSystem.spawn();
-            } else if (results[0] === '💣') {
-                this.state.money = 0;
-                this.state.save();
-                this.ui.setMessage('BOMBA! Všechny peníze shořely.', 'lose');
-            }
+    balance -= spinCost;
+    updateDisplay();
+    logMessage(`Točím válce (-${spinCost} 🍌)...`);
+    
+    spinBtn.disabled = true;
+    let spins = 0;
+    
+    const interval = setInterval(() => {
+        reels.forEach(reel => {
+            reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        });
+        spins++;
+        
+        if (spins > 15) {
+            clearInterval(interval);
+            spinBtn.disabled = false;
+            checkWin();
+        }
+    }, 100);
+});
+
+function checkWin() {
+    const r1 = reels[0].textContent;
+    const r2 = reels[1].textContent;
+    const r3 = reels[2].textContent;
+
+    if (r1 === r2 && r2 === r3) {
+        let win = 0;
+        if (r1 === '🦍') win = 500;
+        if (r1 === '🍌') win = 200;
+        if (r1 === '💎') win = 1000;
+        if (r1 === '💀') win = 0; // Lebka bere vše
+        if (r1 === '💩') win = 10;
+        
+        if (win > 0) {
+            balance += win;
+            logMessage(`JACKPOT! Získáváš ${win} 🍌!`);
         } else {
-            this.ui.setMessage('Zkus to znovu...', 'lose');
-            if (Math.random() > 0.8) AdSystem.spawn();
+            logMessage("Tři lebky... Okamžitá prohra.");
         }
+    } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+        balance += 5;
+        logMessage("Malá shoda. +5 🍌.");
+    } else {
+        logMessage("Nic. Příště to určitě vyjde...");
     }
+    updateDisplay();
 }
 
-class UIManager {
-    constructor() {
-        this.toastContainer = document.getElementById('toast-container');
-        this.msgBox = document.getElementById('message');
-    }
-    setMessage(text, className) {
-        if(!this.msgBox) return;
-        this.msgBox.textContent = text;
-        this.msgBox.className = className;
-    }
-    showToast(title, body) {
-        const toast = document.createElement('div');
-        toast.className = 'chimp-toast show';
-        toast.innerHTML = `<div class="toast-header">${title}</div><div class="toast-body">${body}</div>`;
-        this.toastContainer.appendChild(toast);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 600);
-        }, 4000);
-    }
-}
+// --- UNDERGROUND BANKA ---
+loanBtn.addEventListener('click', () => {
+    balance += 5000;
+    debt += 5000;
+    logMessage("Půjčka 5000 🍌 schválena. Radši to rychle vrať.");
+    updateDisplay();
+});
 
-class AdSystem {
-    static spawn() {
-        const ad = document.createElement('div');
-        ad.className = 'fake-ad';
-        ad.style.top = `${Math.random() * 60 + 10}vh`;
-        ad.style.left = `${Math.random() * 60 + 10}vw`;
-        ad.innerHTML = `
-            <button class="close-btn" onclick="this.parentElement.remove()">X</button>
-            OPIČÍ VIRUS DETEKOVÁN<br><br>
-            ZAPLAŤ NEBO TVŮJ POČÍTAČ VYBUCHNE!
-            <button class="chat-btn" onclick="window.location.href='chat.html'">ZAPLATIT BANÁNY</button>
-        `;
-        document.getElementById('ad-container').appendChild(ad);
+repayBtn.addEventListener('click', () => {
+    if (debt === 0) {
+        logMessage("Nemáš žádné dluhy.");
+        return;
     }
-}
-
-class Navigation {
-    static init(state, ui) {
-        document.getElementById('nav-casino').addEventListener('click', () => location.reload());
-        document.getElementById('nav-bank').addEventListener('click', () => this.renderBank(state, ui));
-        document.getElementById('nav-chat').addEventListener('click', () => window.location.href = 'chat.html');
+    if (balance >= debt) {
+        balance -= debt;
+        logMessage(`Celý dluh (${debt} 🍌) byl splacen.`);
+        debt = 0;
+    } else {
+        logMessage(`Splacena část dluhu: ${balance} 🍌.`);
+        debt -= balance;
+        balance = 0;
     }
+    updateDisplay();
+});
 
-    static renderBank(state, ui) {
-        const panel = document.getElementById('main-panel');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('nav-bank').classList.add('active');
-        
-        panel.innerHTML = `
-            <header class="header">
-                <h1>Underground Banka</h1>
-                <p class="subtitle">Úrok 5% za minutu</p>
-            </header>
-            <section class="status-bar">
-                <div class="status-box"><div class="status-label">Zůstatek</div><div class="status-val val-good" id="bank-money">${state.money}</div></div>
-                <div class="status-box"><div class="status-label">Dluh</div><div class="status-val val-bad" id="bank-debt">${state.debt}</div></div>
-            </section>
-            <div class="bank-actions">
-                <div class="action-card">
-                    <h3>Rychlá Půjčka</h3>
-                    <p>Půjč si <strong>5000 Kč</strong> ihned. Na následky se neptej.</p>
-                    <button class="btn-primary" id="borrow-btn">Půjčit 5000 Kč</button>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('borrow-btn').addEventListener('click', () => {
-            state.addDebt(5000);
-            document.getElementById('bank-money').textContent = state.money;
-            document.getElementById('bank-debt').textContent = state.debt;
-            ui.showToast('PŮJČKA SCHVÁLENA', 'Peníze byly připsány. Gorily si pamatují tvůj obličej.');
-        });
-    }
-}
-
-const gameState = new GameState();
-const uiManager = new UIManager();
-if(document.getElementById('reels-container')) {
-    new SlotMachine(gameState, uiManager);
-}
-Navigation.init(gameState, uiManager);
-
+// Lichvářské úroky (5% každou minutu)
 setInterval(() => {
-    if (gameState.debt > 0) {
-        const interest = Math.ceil(gameState.debt * 0.05);
-        gameState.debt += interest;
-        gameState.save();
-        uiManager.showToast('ÚROK STRŽEN', `Banka ti napařila úrok ${interest} Kč. Čas běží.`);
-        
-        const dDisp = document.getElementById('bank-debt');
-        if(dDisp) dDisp.textContent = gameState.debt;
+    if (debt > 0) {
+        debt = Math.floor(debt * 1.05);
+        updateDisplay();
+        logMessage("Banka: Naskočily úroky (+5%).");
     }
 }, 60000);
+
+// --- SCAM AD SYSTEM (Generátor otravných vyskakovacích oken) ---
+setInterval(() => {
+    // 30% šance, že každé 4 sekundy vyskočí virus/reklama
+    if(Math.random() > 0.7) {
+        let ad = document.createElement('div');
+        ad.style.position = 'fixed';
+        ad.style.top = Math.random() * 70 + 'vh';
+        ad.style.left = Math.random() * 70 + 'vw';
+        ad.style.background = '#ff0000';
+        ad.style.color = '#fff';
+        ad.style.padding = '15px';
+        ad.style.border = '3px solid yellow';
+        ad.style.fontWeight = 'bold';
+        ad.style.zIndex = '9999';
+        ad.style.cursor = 'pointer';
+        ad.style.boxShadow = '0 0 20px yellow';
+        ad.style.fontFamily = '"Comic Sans MS", sans-serif';
+        
+        const adTexts = [
+            "🔥 HORKÉ OPICE VE TVÉM OKOLÍ! KLIKNI 🔥",
+            "⚠️ TVŮJ POČÍTAČ JE ZAVIROVÁN! KLIKNI PRO SKEN ⚠️",
+            "🍌 VYHRÁL JSI 10 000 BANÁNŮ! VYZVEDNI HNED! 🍌",
+            "💀 EXEKUCE NA CESTĚ! ZAPLAŤ POPLATEK ZDE 💀"
+        ];
+        ad.innerText = adTexts[Math.floor(Math.random() * adTexts.length)];
+        
+        // Zlomyslná funkce - kliknutí ti sebere banány
+        ad.onclick = function() {
+            balance -= 100;
+            if(balance < 0) balance = 0;
+            updateDisplay();
+            this.remove();
+            alert("KLASICKÝ SCAM! Byl jsi okraden o 100 🍌!");
+        };
+        
+        document.body.appendChild(ad);
+        // Reklama zmizí sama po 4 sekundách, pokud na ni neklikne
+        setTimeout(() => ad.remove(), 4000);
+    }
+}, 4000);
+
+// Úplně první inicializace čísel při startu
+updateDisplay();
