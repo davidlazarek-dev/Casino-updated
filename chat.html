@@ -3,37 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChimpFinder - Najdi si opičku!</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Chimp Finder | Deep Web</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-green: #00ff55; --dark-bg: #050505; --magenta: #ff00ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--dark-bg); color: var(--neon-green); font-family: 'Courier Prime', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; background-image: repeating-linear-gradient(0deg, rgba(0,255,85,0.05) 0px, rgba(0,255,85,0.05) 1px, transparent 1px, transparent 2px); }
+        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #0a0a0a; border: 2px solid var(--neon-green); box-shadow: 0 0 20px rgba(0,255,85,0.2); display: flex; flex-direction: column; position: relative; }
+        .chat-header { background: var(--neon-green); color: #000; padding: 15px; text-align: center; font-family: 'Montserrat', sans-serif; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: #000; color: var(--neon-green); border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .back-btn:hover { background: #222; color: #fff; }
+        .scam-warning { background: #ff003c; color: #fff; text-align: center; font-size: 0.7rem; padding: 3px; font-weight: bold; }
+        .profile-match { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px dashed var(--neon-green); background: rgba(0,255,85,0.05); }
+        .chimp-avatar { width: 60px; height: 60px; background: #000; border: 2px solid var(--neon-green); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 0 10px rgba(0,255,85,0.5); }
+        .chimp-info h2 { font-size: 1.2rem; color: #fff; margin-bottom: 5px; }
+        .chimp-info p { font-size: 0.8rem; color: #aaa; }
+        .status-dot { color: var(--neon-green); animation: blink 1s infinite; }
+        .chat-window { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { max-width: 80%; padding: 12px 15px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
+        .msg-chimp { align-self: flex-start; background: rgba(0,255,85,0.1); border-left: 3px solid var(--neon-green); color: #fff; }
+        .msg-user { align-self: flex-end; background: rgba(255,0,255,0.1); border-right: 3px solid var(--magenta); color: var(--magenta); text-align: right; }
+        .input-area { display: flex; padding: 15px; border-top: 1px solid var(--neon-green); background: var(--dark-bg); }
+        .chat-input { flex: 1; background: transparent; border: none; color: var(--neon-green); font-family: 'Courier Prime', monospace; font-size: 1rem; outline: none; }
+        .chat-input::placeholder { color: rgba(0,255,85,0.3); }
+        .send-btn { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); padding: 8px 15px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: bold; transition: 0.2s; }
+        .send-btn:hover { background: var(--neon-green); color: #000; }
+        .action-btn { background: #ff003c; color: #fff; border: none; padding: 10px; margin-top: 10px; font-family: 'Montserrat', sans-serif; font-weight: bold; cursor: pointer; width: 100%; display: block; text-align: center; transition: 0.2s; }
+        .action-btn:hover { background: #fff; color: #ff003c; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-green); }
+    </style>
 </head>
-<body style="background: repeating-linear-gradient(45deg, #ff9a9e, #ff9a9e 10px, #fecfef 10px, #fecfef 20px);">
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <button class="back-btn" onclick="window.location.href='index.html'">◄ ZPĚT</button>
+            CHIMP FINDER
+        </div>
+        
+        <div class="scam-warning">⚠️ VAROVÁNÍ: UŽIVATEL VYMÁHÁ BANÁNY A PENÍZE ⚠️</div>
 
-    <div class="page-layout">
-        <div class="chat-app">
-            <h1 class="chat-title">ChimpFinder 💕</h1>
-            <div class="chat-profile-name">💋 Sexy Simona (Vzdálenost: 1 km)</div>
-            
-            <!-- Tady je tvůj nahraný obrázek! -->
-            <img src="stock-photo-sexy-monkey-113248045.jpg" alt="Sexy Opice" class="chat-img">
-            
-            <div class="chat-bubble">
-                "Ahoj ty můj banánový králi... Slyšela jsem, že jsi docela hráč. Nedáme si spolu jeden spin? 😏🍌"
+        <div class="profile-match">
+            <div class="chimp-avatar">🦍</div>
+            <div class="chimp-info">
+                <h2>Kong_69 <span class="status-dot">●</span></h2>
+                <p>0.5 km daleko | Cíl: Tvá peněženka</p>
             </div>
-            
-            <button class="btn-chat" onclick="alert('Simona si tě zablokovala. Zjistila totiž, že jsi po uši v dluzích u Šimpanze z Banky! 💔')">Poslat banán (Zpráva)</button>
-            <button class="btn-escape" onclick="navigate('index.html')">❌ Uprchnout ze seznamky</button>
+        </div>
+
+        <div class="chat-window" id="chat-window">
+            <div class="message msg-chimp">
+                U OOH AHH AHH!! 🍌💦 Zaplať, nebo ti zlomím nohy. Vím o tvých dluzích.
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Napiš zprávu..." autocomplete="off">
+            <button class="send-btn" onclick="sendMessage()">SEND</button>
         </div>
     </div>
 
     <script>
-        // Uchováme parametry, aby ses mohl vrátit do hry beze ztráty!
-        function navigate(page) {
-            const params = window.location.search; // Vezme aktuální URL data
-            window.location.href = page + params;
+        const chatWindow = document.getElementById('chat-window');
+        const chatInput = document.getElementById('chat-input');
+        let messageCount = 0;
+
+        const monkeyReplies = [
+            "OOH OOH AHH AHH! Dělej prachy!",
+            "Kde jsou moje banány? 🍌",
+            "Pošli mi detaily kreditky. Jsem opravdová lidská samice.",
+            "*Háze exkrementy na monitor*",
+            "Tvoje dluhy rostou. Banka mi volala.",
+            "Už stojím před tvým domem."
+        ];
+
+        function addMessage(text, isUser) {
+            const msg = document.createElement('div');
+            msg.className = `message ${isUser ? 'msg-user' : 'msg-chimp'}`;
+            msg.textContent = text;
+            chatWindow.appendChild(msg);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         }
+
+        function addExtortion() {
+            const msg = document.createElement('div');
+            msg.className = 'message msg-chimp';
+            msg.innerHTML = `Vím, že máš peníze z automatů. Dej mi 1000 Kč, nebo na tebe pošlu virus. <button class="action-btn" onclick="payMonkey(this)">ZAPLATIT 1000 Kč VÝPALNÉ</button>`;
+            chatWindow.appendChild(msg);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        window.payMonkey = function(btn) {
+            let debt = parseInt(localStorage.getItem('chimp_debt')) || 0;
+            localStorage.setItem('chimp_debt', debt + 1000);
+            btn.textContent = "ZAPLACENO (Dluh navýšen o 1000 Kč)";
+            btn.disabled = true;
+            btn.style.background = "#555";
+            btn.style.color = "#aaa";
+            setTimeout(() => addMessage("Dobrá opička. Ale zítra chci víc.", false), 1500);
+        };
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            
+            addMessage(text, true);
+            chatInput.value = '';
+            messageCount++;
+
+            setTimeout(() => {
+                // Po 3 zprávách začne opice vydírat uživatele
+                if (messageCount === 3) {
+                    addExtortion();
+                } else {
+                    addMessage(monkeyReplies[Math.floor(Math.random() * monkeyReplies.length)], false);
+                }
+            }, 800 + Math.random() * 1200);
+        }
+
+        chatInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 </html>
