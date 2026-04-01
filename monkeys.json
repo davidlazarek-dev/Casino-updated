@@ -1,50 +1,20 @@
 {
-  "profiles": [
+  "monkeys": [
     {
-      "id": "kong_69",
-      "name": "Kong_69",
-      "avatar": "🦍",
-      "distance": "0.5 km",
-      "goal": "Tvá peněženka",
+      "name": "BananaLover99",
+      "initial_msg": "Ahoj, hledám někoho, kdo mi pomůže s banánovým byznysem. Jsi to ty?",
       "replies": [
-        "OOH OOH AHH AHH! Dělej prachy!",
-        "Kde jsou moje banány? 🍌",
-        "Pošli mi detaily kreditky. Jsem opravdová lidská samice.",
-        "*Háze exkrementy na monitor*",
-        "Tvoje dluhy rostou. Banka mi volala."
-      ],
-      "extortion_amount": 1000,
-      "extortion_msg": "Vím, že máš peníze z automatů. Dej mi 1000 Kč, nebo na tebe pošlu virus."
+        { "text": "Jasně, co potřebuješ?", "action": "chat", "response": "Potřebuju investici 500 🍌 na start." },
+        { "text": "Pošlu ti 500 🍌", "action": "pay", "amount": 500 }
+      ]
     },
     {
-      "id": "crypto_macaque",
-      "name": "Macaque_Broker",
-      "avatar": "🦧",
-      "distance": "12 km (přes VPN)",
-      "goal": "Kryptoměny a chaos",
+      "name": "GorillaQueen",
+      "initial_msg": "Dneska je venku krásně. Nechceš mi poslat nějaké banány pro radost?",
       "replies": [
-        "Uúú áá! Koupil jsi už ten můj NFT banán?",
-        "Banka tě sleduje. Já taky.",
-        "Hacknul jsem ti webkameru. Vypadáš zoufale.",
-        "Dneska padne červená. Věř mi."
-      ],
-      "extortion_amount": 5000,
-      "extortion_msg": "Tohle není hra. Pošli mi 5000 Kč, jinak tvůj dluh v bance okamžitě zdvojnásobím."
-    },
-    {
-      "id": "boss_silverback",
-      "name": "El_Silverback",
-      "avatar": "🐒",
-      "distance": "Za tvými zády",
-      "goal": "Absolutní bankrot",
-      "replies": [
-        "...",
-        "Ticho.",
-        "Moje gorily tě sledují.",
-        "Myslíš, že to kasino je fér? Já ho vlastním."
-      ],
-      "extortion_amount": 15000,
-      "extortion_msg": "Tvůj čas vypršel. Dej mi 15000 Kč nebo končíš."
+        { "text": "Kolik jich chceš?", "action": "chat", "response": "Stačí 1000 🍌, lásko." },
+        { "text": "Pošlu 1000 🍌", "action": "pay", "amount": 1000 }
+      ]
     }
   ]
 }
